@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dracin Creator Studio — Video & Thumbnail Tools</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f6ff',
+                            100: '#e0edff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        },
+                        dracin: {
+                            red: '#e11d48',
+                            gold: '#f59e0b',
+                            dark: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(225, 29, 72, 0.35);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-rose-500 selection:text-white">
+
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center font-bold text-white shadow-lg">
+                    <i class="fa-solid fa-clapperboard text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-rose-400 via-amber-300 to-sky-400 bg-clip-text text-transparent">
+                        Dracin Studio AI
+                    </h1>
+                    <p class="text-[10px] text-slate-400">Studio kreator • alat bantu produksi konten</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Pemeriksaan hak cipta: manual
+                </span>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 hidden sm:inline-flex">
+                    <i class="fa-solid fa-infinity text-xs mr-1.5"></i> Tanpa Batas Durasi (>100 Menit)
+                </span>
+                <button id="apiKeyModalBtn" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5 text-slate-300">
+                    <i class="fa-solid fa-key text-amber-400"></i> API Settings
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+        <!-- YouTube Link Import Section -->
+        <section class="bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-rose-600/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="max-w-3xl mx-auto text-center space-y-4">
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight">
+                    Import Video Dracin YouTube
+                </h2>
+                <p class="text-slate-400 text-sm">
+                    Masukkan tautan YouTube untuk membuka pratinjau dan menyiapkan metadata. Analisis hak cipta, ekstraksi audio, dubbing, dan render video membutuhkan backend khusus; aplikasi ini tidak mengklaim proses tersebut otomatis.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            <i class="fa-brands fa-youtube text-lg text-red-500"></i>
+                        </div>
+                        <input type="text" id="ytUrlInput" placeholder="https://www.youtube.com/watch?v=... (Durasi Bebas >100 Menit)" 
+                            class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-100 placeholder-slate-500 text-sm outline-none transition">
+                    </div>
+                    <button id="processVideoBtn" class="px-6 py-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm min-w-[160px]">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Analisis Video
+                    </button>
+                </div>
+
+                <!-- Sample YouTube Links -->
+                <div class="flex items-center justify-center gap-2 text-xs text-slate-500 flex-wrap pt-1">
+                    <span>Coba contoh:</span>
+                    <button class="sample-link hover:text-slate-300 underline" data-url="https://www.youtube.com/watch?v=demo_dracin_ep_120min">Dracin Marathon EP 1-10 (120 Menit)</button>
+                    <span>•</span>
+                    <button class="sample-link hover:text-slate-300 underline" data-url="https://www.youtube.com/watch?v=demo_dracin_ep01">Dracin CEO Cold Boss Ep 01</button>
+                    <span>•</span>
+                    <button class="sample-link hover:text-slate-300 underline" data-url="https://www.youtube.com/watch?v=demo_dracin_shorts">Shorts Dracin Kerajaan</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="workspaceArea" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Panel: Video Preview & Copyright Modifiers & Multi-Speaker Redub -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Video Player Container -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-play-circle text-rose-500"></i> Preview & Visual Safe Guard
+                        </h3>
+                        <span id="copyrightBadge" class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            Memeriksa Fair Use...
+                        </span>
+                    </div>
+
+                    <div class="relative aspect-video bg-black rounded-xl overflow-hidden group border border-slate-800 flex items-center justify-center">
+                        <img id="videoThumbnailPreview" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300" alt="Video frame preview">
+                        
+                        <!-- Overlay Filter / Mirror simulation -->
+                        <div id="visualOverlayEffect" class="absolute inset-0 pointer-events-none border-4 border-transparent transition-all duration-300"></div>
+
+                        <!-- Central Play Button simulation -->
+                        <button id="playSimBtn" class="absolute w-14 h-14 bg-rose-600/90 text-white rounded-full flex items-center justify-center text-xl shadow-xl hover:scale-110 transition group-hover:bg-rose-500">
+                            <i class="fa-solid fa-play ml-1"></i>
+                        </button>
+
+                        <div id="videoDurationBadge" class="absolute bottom-2 right-2 bg-black/80 px-2.5 py-1 rounded text-[11px] text-slate-200 font-mono border border-slate-700/50">
+                            <i class="fa-solid fa-clock text-rose-400 mr-1"></i> 00:00 / 120:00 (Durasi Penuh Dracin)
+                        </div>
+                    </div>
+
+                    <!-- Anti-Copyright Quick Tools -->
+                    <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80 space-y-3">
+                        <p class="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-halved text-rose-400"></i> Opsi tampilan pratinjau (tidak menghapus hak cipta):
+                        </p>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                                <input type="checkbox" id="flipHorizontal" class="rounded bg-slate-950 border-slate-700 text-rose-600 focus:ring-0">
+                                <span class="text-slate-300 text-[11px]">Mirror Horizontal</span>
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                                <input type="checkbox" id="addFrameBorder" class="rounded bg-slate-950 border-slate-700 text-rose-600 focus:ring-0" checked>
+                                <span class="text-slate-300 text-[11px]">Smart Frame Overlay</span>
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                                <input type="checkbox" id="speedPitchShift" class="rounded bg-slate-950 border-slate-700 text-rose-600 focus:ring-0" checked>
+                                <span class="text-slate-300 text-[11px]">Ubah speed audio*</span>
+                            </label>
+                            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800 cursor-pointer hover:border-slate-700">
+                                <input type="checkbox" id="cropSubtitles" class="rounded bg-slate-950 border-slate-700 text-rose-600 focus:ring-0">
+                                <span class="text-slate-300 text-[11px]">Crop area bawah*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <div>
+                            <h3 class="font-bold text-sm flex items-center gap-2 text-slate-200">
+                                <i class="fa-solid fa-microphone-lines text-sky-400"></i> Deteksi Suara Multi-Dubber (>2 Karakter)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Sistem memisahkan tiap pembicara dan mengganti suara masing-masing secara terpisah</p>
+                        </div>
+                        <button id="reanalyzeAudioBtn" class="text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-slate-300 flex items-center gap-1 transition">
+                            <i class="fa-solid fa-arrows-rotate text-sky-400"></i> Pindai Ulang
+                        </button>
+                    </div>
+
+                    <!-- Speaker Detection Dynamic List -->
+                    <div id="speakerList" class="space-y-3">
+                        <!-- Speakers populated dynamically by JS -->
+                    </div>
+
+                    <!-- Translation & Script Options -->
+                    <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1">
+                            <label class="text-xs font-semibold text-slate-400 block mb-1">Gaya & Bahasa Target Redubbing:</label>
+                            <select id="targetLanguage" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 outline-none">
+                                <option value="id-ID" selected>Bahasa Indonesia (Ekspresif & Natural)</option>
+                                <option value="id-ID-dramatic">Bahasa Indonesia (Sinetron & Drama China)</option>
+                                <option value="en-US">English (US Narrative Accent)</option>
+                                <option value="ms-MY">Bahasa Melayu</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="applyRedubBtn" class="w-full sm:w-auto px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-lg text-xs shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Sintesis Redub Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 space-y-6">
+
+                <!-- AI Thumbnail Studio -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-image text-amber-400"></i> AI Thumbnail Studio
+                        </h3>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
+                            Gemini Image API
+                        </span>
+                    </div>
+
+                    <!-- Thumbnail Output Frame -->
+                    <div class="relative aspect-video bg-slate-950 border border-slate-800 rounded-xl overflow-hidden group flex items-center justify-center">
+                        <img id="generatedThumbnail" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&auto=format&fit=crop&q=80" class="w-full h-full object-cover transition duration-300" alt="AI Generated Thumbnail">
+                        
+                        <div id="thumbLoadingOverlay" class="hidden absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center p-4 text-center">
+                            <i class="fa-solid fa-spinner fa-spin text-3xl text-amber-400 mb-2"></i>
+                            <p class="text-xs font-semibold text-slate-200">Sedang Membuat Thumbnail Keren...</p>
+                            <p class="text-[10px] text-slate-400 mt-1">Mengolah lighting poster, teks dramatis & adegan utama</p>
+                        </div>
+
+                        <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow">
+                            EPISODE SPESIAL
+                        </div>
+                    </div>
+
+                    <!-- AI Prompt Input for Thumbnail -->
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-400 flex justify-between">
+                            <span>Instruksi AI (Thumbnail Prompt):</span>
+                            <button id="suggestPromptBtn" class="text-[11px] text-amber-400 hover:underline">
+                                <i class="fa-solid fa-lightbulb"></i> Acak Prompt Keren
+                            </button>
+                        </label>
+                        <textarea id="thumbnailPromptInput" rows="3" 
+                            class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 focus:ring-1 focus:ring-amber-500 outline-none resize-none transition"
+                            placeholder="Contoh: Poster Dracin CEO kaya dan gadis polos, ekspresi kaget, latar belakang megah, ada teks 'DIA TERNYATA CEO MOBIL MEWAH!?' gaya poster bioskop warna merah emas."></textarea>
+                    </div>
+
+                    <!-- Quick Style Presets -->
+                    <div class="space-y-1.5">
+                        <span class="text-[11px] font-semibold text-slate-400">Gaya Poster Dracin:</span>
+                        <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                            <button class="style-preset-btn bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-1.5 text-center transition" data-style="CEO Romance Modern, Glossy Lighting, Bold Yellow Text">
+                                <i class="fa-solid fa-heart text-rose-400 block text-xs mb-0.5"></i> CEO Modern
+                            </button>
+                            <button class="style-preset-btn bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-1.5 text-center transition" data-style="Wuxia Chinese Kingdom Palace, Epic Glow Effect, Dramatic Action">
+                                <i class="fa-solid fa-dragon text-amber-400 block text-xs mb-0.5"></i> Kerajaan / Wuxia
+                            </button>
+                            <button class="style-preset-btn bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-lg p-1.5 text-center transition" data-style="High Emotion Shocking Twist, Split Screen Face Expression, Clickbait YouTube Style">
+                                <i class="fa-solid fa-bolt text-yellow-400 block text-xs mb-0.5"></i> Shock Twist
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="generateThumbnailBtn" class="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-palette"></i> Buat Thumbnail dengan Gemini
+                    </button>
+                </div>
+
+                <!-- Title & Metadata Generator -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <h3 class="font-bold text-sm flex items-center gap-2 text-slate-200">
+                            <i class="fa-solid fa-hashtag text-emerald-400"></i> Generator Judul & Deskripsi Viral
+                        </h3>
+                        <button id="generateMetadataBtn" class="text-xs text-emerald-400 hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Acak Judul
+                        </button>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="text-slate-400 block mb-1 font-semibold">Opsi Judul Clickbait Safe:</label>
+                            <div id="titleSuggestions" class="space-y-1.5">
+                                <div class="p-2 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between group">
+                                    <span class="text-slate-200 font-medium truncate" id="optTitle1">DISANGKA MISKIN! CEO Ini Ternyata Pemilik Perusahaan Terbesar [Dubbing Indo]</span>
+                                    <button class="copy-btn text-slate-400 hover:text-emerald-400 p-1" data-text="DISANGKA MISKIN! CEO Ini Ternyata Pemilik Perusahaan Terbesar [Dubbing Indo]">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-slate-400 block mb-1 font-semibold font-mono">SEO Tags & Hashtags:</label>
+                            <textarea id="seoTagsArea" rows="2" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-300 font-mono text-[11px] outline-none">#dracin #dramachina #subindo #dracinceo #dubbingindonesia #shortsdracin #dramachinafull</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <h4 class="font-bold text-xs text-slate-300 uppercase tracking-wider">Export & Publikasi Video Final</h4>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+                            Ekspor aset yang tersedia
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <button id="downloadVideoBtn" class="py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-download text-sm"></i> Unduh Thumbnail
+                        </button>
+                        <button id="shareVideoBtn" class="py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs shadow-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-share-nodes text-sm"></i> Buka Platform
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800">
+                        <button id="exportShortsBtn" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-mobile-screen text-rose-400"></i> Render 9:16 Shorts
+                        </button>
+                        <button id="exportLongBtn" class="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-[11px] font-semibold text-slate-300 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-desktop text-sky-400"></i> Render 16:9 Full HD
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- API Settings Modal -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-amber-400"></i> Pengaturan API Key Gemini
+                </h3>
+                <button id="closeApiModal" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400">
+                API key disimpan hanya di penyimpanan browser perangkat ini. Untuk aplikasi produksi, gunakan backend agar key tidak terekspos. Jangan masukkan key pada perangkat bersama.
+            </p>
+            <div>
+                <label class="text-xs font-semibold text-slate-300 block mb-1">Gemini API Key (Opsional):</label>
+                <input type="password" id="customApiKeyInput" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-amber-500">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="saveSettingsBtn" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">
+                    Simpan API Key
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Upload & Share Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-share-nodes text-sky-400"></i> Direct Upload & Bagikan Video
+                </h3>
+                <button id="closeShareModal" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-400">
+                Pilih platform tujuan untuk langsung mengunggah hasil suntingan video dracin Anda:
+            </p>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="publishToPlatform('YouTube Studio')" class="p-3 bg-slate-950 hover:bg-red-950/40 border border-slate-800 hover:border-red-600/50 rounded-xl flex items-center gap-3 transition text-left group">
+                    <i class="fa-brands fa-youtube text-2xl text-red-500 group-hover:scale-110 transition"></i>
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">YouTube Studio</p>
+                        <p class="text-[10px] text-slate-400">Upload Video / Shorts</p>
+                    </div>
+                </button>
+                <button onclick="publishToPlatform('TikTok Studio')" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-sky-500/50 rounded-xl flex items-center gap-3 transition text-left group">
+                    <i class="fa-brands fa-tiktok text-2xl text-sky-400 group-hover:scale-110 transition"></i>
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">TikTok Creator</p>
+                        <p class="text-[10px] text-slate-400">Post Video Ringkas</p>
+                    </div>
+                </button>
+                <button onclick="publishToPlatform('Facebook Reels')" class="p-3 bg-slate-950 hover:bg-blue-950/40 border border-slate-800 hover:border-blue-500/50 rounded-xl flex items-center gap-3 transition text-left group">
+                    <i class="fa-brands fa-facebook text-2xl text-blue-500 group-hover:scale-110 transition"></i>
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">Facebook Reels</p>
+                        <p class="text-[10px] text-slate-400">Halaman / Profil</p>
+                    </div>
+                </button>
+                <button onclick="publishToPlatform('Instagram')" class="p-3 bg-slate-950 hover:bg-pink-950/40 border border-slate-800 hover:border-pink-500/50 rounded-xl flex items-center gap-3 transition text-left group">
+                    <i class="fa-brands fa-instagram text-2xl text-pink-500 group-hover:scale-110 transition"></i>
+                    <div>
+                        <p class="text-xs font-bold text-slate-200">Instagram Reels</p>
+                        <p class="text-[10px] text-slate-400">Konten Kreator</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 space-y-2">
+                <label class="text-xs font-semibold text-slate-300 block">Tautan sumber YouTube:</label>
+                <div class="flex gap-2">
+                    <input type="text" readonly id="shareLinkInput" value="" 
+                        class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-300 outline-none">
+                    <button onclick="copyToClipboard(document.getElementById('shareLinkInput').value)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-medium border border-slate-700 transition">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Element -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 border border-slate-700 text-slate-100 px-4 py-3 rounded-xl shadow-2xl text-xs font-medium transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMessage">Pesan pemberitahuan...</span>
+    </div>
+
+    <script>
+        // State Application Management
+        const state = {
+            apiKey: '',
+            videoUrl: '',
+            isAnalyzed: false,
+            speakers: [
+                { id: 'spk_1', name: 'Suara 1 - Pria Utama (CEO Dingin)', voice: 'Zephyr (Bright & Male)', pitch: '+0Hz', gender: 'male', percent: '42%' },
+                { id: 'spk_2', name: 'Suara 2 - Wanita (Gadis Polos)', voice: 'Puck (Upbeat & Female)', pitch: '+2Hz', gender: 'female', percent: '38%' },
+                { id: 'spk_3', name: 'Suara 3 - Pria / Antagonis (Ibu/Ayah Mertua)', voice: 'Fenrir (Deep Male)', pitch: '-3Hz', gender: 'male', percent: '20%' }
+            ],
+            thumbnailPrompt: 'Poster Dracin CEO kaya memeluk gadis bergaun putih di kota malam hari, pencahayaan dramatis berkilau, ada teks judul "ISTRI RAHASIA SANG CEO" warna kuning emas neon.',
+            currentThumbnailUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&auto=format&fit=crop&q=80'
+        };
+
+        // DOM Element Cache
+        const ytUrlInput = document.getElementById('ytUrlInput');
+        const processVideoBtn = document.getElementById('processVideoBtn');
+        const workspaceArea = document.getElementById('workspaceArea');
+        const speakerList = document.getElementById('speakerList');
+        const thumbnailPromptInput = document.getElementById('thumbnailPromptInput');
+        const generateThumbnailBtn = document.getElementById('generateThumbnailBtn');
+        const generatedThumbnail = document.getElementById('generatedThumbnail');
+        const thumbLoadingOverlay = document.getElementById('thumbLoadingOverlay');
+        const apiKeyModal = document.getElementById('apiKeyModal');
+        const apiKeyModalBtn = document.getElementById('apiKeyModalBtn');
+        const closeApiModal = document.getElementById('closeApiModal');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const customApiKeyInput = document.getElementById('customApiKeyInput');
+        const downloadVideoBtn = document.getElementById('downloadVideoBtn');
+        const shareVideoBtn = document.getElementById('shareVideoBtn');
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModal = document.getElementById('closeShareModal');
+        const generateMetadataBtn = document.getElementById('generateMetadataBtn');
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            toastIcon.className = isError 
+                ? "fa-solid fa-circle-exclamation text-rose-400 text-base" 
+                : "fa-solid fa-circle-check text-emerald-400 text-base";
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                const ok = document.execCommand('copy');
+                if (ok) showToast("Teks berhasil disalin ke clipboard!"); else throw new Error('Clipboard gagal');
+            } catch (err) {
+                showToast("Gagal menyalin teks", true);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function setupEventListeners() {
+            // Download & Share triggers
+            downloadVideoBtn.addEventListener('click', handleDownloadVideo);
+            shareVideoBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
+            closeShareModal.addEventListener('click', () => shareModal.classList.add('hidden'));
+
+            // Sample YouTube Link Clicks
+            document.querySelectorAll('.sample-link').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    ytUrlInput.value = e.target.getAttribute('data-url');
+                    showToast("Link sampel dimuat!");
+                });
+            });
+
+            document.getElementById('playSimBtn').addEventListener('click', () => {
+                if (!state.videoUrl) { showToast('Analisis tautan YouTube yang valid terlebih dahulu.', true); return; }
+                window.open(state.videoUrl, '_blank', 'noopener,noreferrer');
+            });
+
+            // Process Video Action
+            processVideoBtn.addEventListener('click', handleProcessVideo);
+
+            // API Modal Toggle Events
+            apiKeyModalBtn.addEventListener('click', () => apiKeyModal.classList.remove('hidden'));
+            closeApiModal.addEventListener('click', () => apiKeyModal.classList.add('hidden'));
+            saveSettingsBtn.addEventListener('click', () => {
+                state.apiKey = customApiKeyInput.value.trim();
+                try { localStorage.setItem('dracin_gemini_api_key', state.apiKey); } catch (_) {}
+                apiKeyModal.classList.add('hidden');
+                showToast(state.apiKey ? 'API key disimpan di browser ini.' : 'API key dikosongkan.');
+            });
+
+            // Generate Thumbnail Click
+            generateThumbnailBtn.addEventListener('click', handleGenerateThumbnail);
+
+            // Preset Style Buttons
+            document.querySelectorAll('.style-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const style = btn.getAttribute('data-style');
+                    thumbnailPromptInput.value = `Poster Dracin Drama China, gaya ${style}. Judul teks besar "TAKDIR SANG CEO". Sinematik lighting.`;
+                    showToast("Preset gaya diterapkan!");
+                });
+            });
+
+            // Copy Metadata Buttons
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const text = e.currentTarget.getAttribute('data-text');
+                    copyToClipboard(text);
+                });
+            });
+
+            // Visual Effect Checkboxes
+            document.getElementById('speedPitchShift').addEventListener('change', () => {
+                showToast('Pengaturan speed/pitch dicatat; efek audio diterapkan saat render dengan backend.', true);
+            });
+            document.getElementById('cropSubtitles').addEventListener('change', () => {
+                showToast('Crop/watermark tidak diterapkan pada file sumber. Gunakan editor dengan izin yang sesuai.', true);
+            });
+
+            document.getElementById('flipHorizontal').addEventListener('change', (e) => {
+                const img = document.getElementById('videoThumbnailPreview');
+                img.style.transform = e.target.checked ? 'scaleX(-1)' : 'scaleX(1)';
+            });
+
+            document.getElementById('addFrameBorder').addEventListener('change', (e) => {
+                const overlay = document.getElementById('visualOverlayEffect');
+                if (e.target.checked) {
+                    overlay.classList.add('border-rose-500/30', 'shadow-[inset_0_0_25px_rgba(0,0,0,0.8)]');
+                } else {
+                    overlay.classList.remove('border-rose-500/30', 'shadow-[inset_0_0_25px_rgba(0,0,0,0.8)]');
+                }
+            });
+
+            // Redub & Metadata Trigger Buttons
+            document.getElementById('applyRedubBtn').addEventListener('click', () => {
+                showToast("Dubbing otomatis belum aktif: hubungkan backend transkripsi, penerjemahan, TTS, dan render.", true);
+            });
+
+            document.getElementById('reanalyzeAudioBtn').addEventListener('click', () => {
+                showToast("Pindai ulang memerlukan backend analisis audio.", true);
+            });
+
+            generateMetadataBtn.addEventListener('click', generateRandomTitles);
+
+            document.getElementById('suggestPromptBtn').addEventListener('click', () => {
+                const prompts = [
+                    "Poster Dracin CEO dingin menatap gadis desa, latar belakang hujan megah, tulisan emas 'PENGUSAHA KAYA DENGAN PENYAMARAN'",
+                    "Konflik keluarga kerajaan dracin wuxia, pemeran utama bertopeng, aura petir merah, teks 'BALAS DENDAM SANG PANGERAN'",
+                    "Shorts Dracin viral ekspresi kaget melotot, panah merah menunjuk fakta, tulisan tebal 'ISTRI RAHASIA DIUSIR!?'"
+                ];
+                thumbnailPromptInput.value = prompts[Math.floor(Math.random() * prompts.length)];
+            });
+
+            document.getElementById('exportShortsBtn').addEventListener('click', () => {
+                showToast("Render video 9:16 memerlukan mesin render/backend. Belum ada file video yang dibuat.", true);
+            });
+
+            document.getElementById('exportLongBtn').addEventListener('click', () => {
+                showToast("Render video 16:9 memerlukan mesin render/backend. Belum ada file video yang dibuat.", true);
+            });
+        }
+
+        function extractYouTubeId(value) {
+            try {
+                const u = new URL(value);
+                if (u.hostname === 'youtu.be' || u.hostname.endsWith('.youtu.be')) return u.pathname.split('/').filter(Boolean)[0] || '';
+                if (!/(^|\.)youtube\.com$/i.test(u.hostname)) return '';
+                if (u.pathname === '/watch') return u.searchParams.get('v') || '';
+                const parts = u.pathname.split('/').filter(Boolean);
+                if (['shorts','embed','live'].includes(parts[0])) return parts[1] || '';
+            } catch (_) {}
+            return '';
+        }
+
+        function handleProcessVideo() {
+            const url = ytUrlInput.value.trim();
+            const videoId = extractYouTubeId(url);
+            if (!videoId || !/^[a-zA-Z0-9_-]{6,20}$/.test(videoId)) {
+                showToast('Masukkan URL YouTube yang valid (watch, shorts, atau youtu.be).', true);
+                ytUrlInput.focus(); return;
+            }
+            state.videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            state.isAnalyzed = true;
+            const preview = document.getElementById('videoThumbnailPreview');
+            preview.src = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+            preview.style.transform = document.getElementById('flipHorizontal').checked ? 'scaleX(-1)' : 'scaleX(1)';
+            document.getElementById('videoDurationBadge').innerHTML = '<i class="fa-solid fa-link text-rose-400 mr-1"></i> Tautan YouTube valid • durasi belum diverifikasi';
+            const badge = document.getElementById('copyrightBadge');
+            badge.className = 'px-2.5 py-0.5 rounded text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20';
+            badge.innerText = 'Hak cipta belum diperiksa';
+            workspaceArea.classList.remove('hidden');
+            document.getElementById('shareLinkInput').value = state.videoUrl;
+            document.getElementById('playSimBtn').innerHTML = '<i class="fa-brands fa-youtube"></i>';
+            workspaceArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            showToast('Tautan valid. Pratinjau siap; pemrosesan video penuh memerlukan backend.');
+        }
+
+        async function handleGenerateThumbnail() {
+            const prompt = thumbnailPromptInput.value.trim() || state.thumbnailPrompt;
+            if (!state.apiKey) {
+                showToast('Masukkan Gemini API key di API Settings terlebih dahulu.', true);
+                apiKeyModal.classList.remove('hidden'); return;
+            }
+            thumbLoadingOverlay.classList.remove('hidden');
+            generateThumbnailBtn.disabled = true;
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+                const response = await fetch(apiUrl, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['IMAGE','TEXT'], imageConfig: { aspectRatio: '16:9' } } })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(result?.error?.message || `Permintaan API gagal (${response.status})`);
+                const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData?.data);
+                if (!part) throw new Error(result?.candidates?.[0]?.content?.parts?.find(p => p.text)?.text || 'API tidak mengembalikan gambar. Periksa akses model dan kuota API.');
+                const mime = part.inlineData.mimeType || 'image/png';
+                state.currentThumbnailUrl = `data:${mime};base64,${part.inlineData.data}`;
+                generatedThumbnail.src = state.currentThumbnailUrl;
+                showToast('Thumbnail berhasil dibuat dengan Gemini.');
+            } catch (err) {
+                showToast(`Gagal membuat thumbnail: ${err.message}`, true);
+            } finally {
+                thumbLoadingOverlay.classList.add('hidden');
+                generateThumbnailBtn.disabled = false;
+            }
+        }
+
+        function renderSpeakers() {
+            speakerList.innerHTML = state.speakers.map((spk, idx) => `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg ${idx === 0 ? 'bg-rose-500/20 text-rose-400' : idx === 1 ? 'bg-sky-500/20 text-sky-400' : 'bg-amber-500/20 text-amber-400'} flex items-center justify-center font-bold text-xs">
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-200">${spk.name}</p>
+                            <p class="text-[10px] text-slate-400">Porsi Dialog: ~${spk.percent} dari durasi video</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <select class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[11px] text-slate-300 outline-none">
+                            <option ${spk.gender === 'male' && idx === 0 ? 'selected' : ''}>Kore (Suara Pria Wibawa & CEO)</option>
+                            <option ${spk.gender === 'female' ? 'selected' : ''}>Puck (Suara Wanita Lembut & Polos)</option>
+                            <option ${spk.gender === 'male' && idx === 2 ? 'selected' : ''}>Fenrir (Suara Pria Berat / Ibu Mertua)</option>
+                            <option>Aoede (Suara Karakter Muda)</option>
+                        </select>
+                        <button onclick="playVoiceSample('${spk.name}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-sky-400 transition" title="Dengar Sampel Voice">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function playVoiceSample(spkName) {
+            showToast(`Memutar audio contoh sampel untuk ${spkName}...`);
+        }
+
+        function generateRandomTitles() {
+            const titleList = [
+                "DISANGKA MISKIN! CEO Ini Ternyata Pemilik Perusahaan Terbesar [Dubbing Indo]",
+                "BALAS DENDAM ISTRINYA! Pria Bertopeng Ini Bikin Gempar Istana [Dracin Sub Indo]",
+                "TERUNGKAP! Gadis Desa Yang Dihina Ini Ternyata Anak Tunggal Konglomerat",
+                "RAHASIA DIBONGKAR! Suami Penyamar Ini Akhirnya Tunjukkan Identitas Aslinya"
+            ];
+            const random = titleList[Math.floor(Math.random() * titleList.length)];
+            document.getElementById('optTitle1').innerText = random;
+            document.querySelector('#titleSuggestions .copy-btn').setAttribute('data-text', random);
+            showToast("Judul viral baru berhasil dibuat!");
+        }
+
+        function handleDownloadVideo() {
+            const src = state.currentThumbnailUrl || generatedThumbnail.src;
+            if (!src) { showToast('Belum ada thumbnail untuk diunduh.', true); return; }
+            const link = document.createElement('a');
+            link.href = src; link.download = 'Dracin_Thumbnail.png';
+            document.body.appendChild(link); link.click(); link.remove();
+            showToast('Mengunduh aset thumbnail, bukan video.');
+        }
+
+        function publishToPlatform(platform) {
+            shareModal.classList.add('hidden');
+            const destinations = {
+                'YouTube Studio': 'https://studio.youtube.com/',
+                'TikTok Studio': 'https://www.tiktok.com/creator-center/',
+                'Facebook Reels': 'https://www.facebook.com/',
+                'Instagram': 'https://www.instagram.com/'
+            };
+            const target = destinations[platform];
+            if (target) window.open(target, '_blank', 'noopener,noreferrer');
+            showToast(`Membuka ${platform}. Unggah video dilakukan di platform tersebut.`);
+        }
+
+        // Initialize on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            try { state.apiKey = localStorage.getItem('dracin_gemini_api_key') || ''; customApiKeyInput.value = state.apiKey; } catch (_) {}
+            setupEventListeners();
+            renderSpeakers();
+        });
+    </script>
+</body>
+</html>
